@@ -9,34 +9,44 @@ integer_list = list(map(lambda integer: int(integer), integer_set))
 
 class QuickSortCompCounter:
 
-    def __init__(self):
+    def __init__(self, pivot_how: str):
         self.comp_count = 0
+        self.pivot_how = pivot_how
+
+    @staticmethod
+    def get_random_pivot_index(input_array: list):
+        # randomly pick pivot index
+        return random.randint(0, len(input_array) - 1)
+
+    @staticmethod
+    def get_median_of_three_pivot_index(input_array: list):
+        # median-of-three pivot index
+        first = input_array[0]
+        middle = input_array[int((len(input_array) + 1) / 2) - 1]
+        last = input_array[-1]
+        return input_array.index(median([first, middle, last]))
 
     def compute_quick_sort(self, input_array: list) -> list:
         if len(input_array) < 2:
             return input_array
 
-        # randomly pick pivot index
-        # pivot_index = random.randint(0, len(input_array) - 1)
+        if self.pivot_how == "random":
+            pivot_index = self.get_random_pivot_index(input_array)
 
-        # always use first elem
-        # pivot_index = 0
+        elif self.pivot_how == "first":
+            pivot_index = 0
 
-        # always use last elem
-        # pivot_index = (len(input_array) - 1)
+        elif self.pivot_how == "last":
+            pivot_index = -1
 
-        # median-of-three pivot index
-
-        first = input_array[0]
-        middle = input_array[int((len(input_array) + 1) / 2) - 1]
-        last = input_array[-1]
-        pivot_index = input_array.index(median([first, middle, last]))
+        elif self.pivot_how == "median":
+            pivot_index = self.get_median_of_three_pivot_index(input_array)
+        else:
+            raise Exception("Invalid 'pivot how': %s" % self.pivot_how)
 
         # move pivot to first index
         if not pivot_index == 0:
-            pivot_val = input_array[pivot_index]
-            input_array[pivot_index] = input_array[0]
-            input_array[0] = pivot_val
+            input_array = self.swap_postion(input_array, pivot_index, 0)
 
         # do partition
         i = 0
@@ -44,11 +54,7 @@ class QuickSortCompCounter:
         pivot_val = input_array[0]
         while j < len(input_array):
             if input_array[j] < pivot_val:
-                cur_small = input_array[j]
-                boundary = input_array[i + 1]
-                # switch
-                input_array[i + 1] = cur_small
-                input_array[j] = boundary
+                input_array = self.swap_postion(input_array, j, i + 1)
                 i += 1
                 j += 1
                 continue
@@ -59,9 +65,7 @@ class QuickSortCompCounter:
         self.comp_count += (len(input_array) - 1)
 
         # finally switch pivot with boundary
-        boundary = input_array[i]
-        input_array[0] = boundary
-        input_array[i] = pivot_val
+        input_array = self.swap_postion(input_array, i, 0)
 
         # recursive calls
         smaller = self.compute_quick_sort(input_array[:i])
@@ -70,8 +74,15 @@ class QuickSortCompCounter:
 
         return smaller + pivot + bigger
 
+    @staticmethod
+    def swap_postion(input_array: list, target_index: int, counter_index: int):
+        target_val = input_array[target_index]
+        input_array[target_index] = input_array[counter_index]
+        input_array[counter_index] = target_val
+        return input_array
 
-tester = QuickSortCompCounter()
+
+tester = QuickSortCompCounter("random")
 result = tester.compute_quick_sort(integer_list)
 print(result)
 print(tester.comp_count)
