@@ -133,5 +133,7 @@ dmypy.json
 pyvenv.cfg
 pip-selfcheck.json
 
-.idea*
+.idea/*
+.vscode
 
+*.xml
